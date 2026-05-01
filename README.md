@@ -1,138 +1,157 @@
-Quality Audit Checker — Blender Add-on
+# Quality Audit Checker : Blender Add-on
 
-A production QA tool for Blender that scans your scene for asset quality issues and lets you fix them without leaving the panel. Built for 3D artists and technical artists who need to validate and clean up .blend files before handing them off for export, engine import, or delivery.
+A production QA tool for Blender that scans your scene for asset quality issues and lets you fix them without leaving the panel. Built for 3D artists and technical artists who need to validate and clean up `.blend` files before handing them off for export, engine import, or delivery.
 
-Where to find it
+---
 
-View3D → Sidebar (N-panel) → QA Audit
+## Where to find it
 
-What it checks
-1. Transforms
+`View3D → Sidebar (N-panel) → QA Audit`
 
+---
+
+## What it checks
+
+### 1. Transforms
 Detects mesh objects with un-applied location, rotation, or scale. Each component is checked independently, so you can apply only what is wrong.
 
-Button	What it does
-Apply Location	Zeroes the world-space location into the mesh
-Apply Rotation	Bakes the rotation into the mesh
-Apply Scale	Resets scale to (1, 1, 1) by baking into the mesh
-2. UV Channel Names
+| Button | What it does |
+|---|---|
+| Apply Location | Zeroes the world-space location into the mesh |
+| Apply Rotation | Bakes the rotation into the mesh |
+| Apply Scale | Resets scale to (1, 1, 1) by baking into the mesh |
 
-Validates UV map names against a configurable regex (default: ^UV_.*).
+### 2. UV Channel Names
+Validates UV map names against a configurable regex (default: `^UV_.*`).
 
-Valid examples: UV_Map, UV_Base, UV_Lightmap
+Valid examples: `UV_Map`, `UV_Base`, `UV_Lightmap`
 
-The rename field defaults to UV_Map. One click renames all UV channels on the selected object to match the convention. Additional channels get UV_Map_1, UV_Map_2, etc.
+The rename field defaults to `UV_Map`. One click renames all UV channels on the selected object to match the convention (additional channels get `UV_Map_1`, `UV_Map_2`, etc.).
 
-3. Object Name vs Mesh Data Name
-
+### 3. Object Name vs Mesh Data Name
 Checks that the object name and its internal mesh data-block name match.
 
-Example of a mismatch:
-
+**Example of a mismatch:**
+```
 Object name:    SM_Barrel
 Mesh data name: Cube.001
+```
 
-One-click fix copies the object name onto the mesh data-block. A global Match All Mesh-Name to Object button fixes every mesh in the scene at once.
+One-click fix copies the object name onto the mesh data-block. A global **Match All Mesh-Name to Object** button fixes every mesh in the scene at once.
 
-4. Mesh Naming Prefixes
-
+### 4. Mesh Naming Prefixes
 Enforces naming conventions for static and skeletal meshes:
 
-Type	Required prefix	How it's detected
-Static mesh	SM_	No armature modifier or armature parent
-Skeletal mesh	SK_	Has an Armature modifier or is parented to an armature
+| Type | Required prefix | How it's detected |
+|---|---|---|
+| Static mesh | `SM_` | No armature modifier or armature parent |
+| Skeletal mesh | `SK_` | Has an Armature modifier or is parented to an armature |
 
 One-click fix applies the correct prefix automatically.
 
-5. Material Naming Prefix
+### 5. Material Naming Prefix
+Checks that all materials assigned to a mesh start with `MT_`.
 
-Checks that all materials assigned to a mesh start with MT_.
+**Example:** `MT_Barrel_Metal`, `MT_Ground_Dirt`
 
-Example: MT_Barrel_Metal, MT_Ground_Dirt
+One-click fix prepends `MT_` to any non-conforming material name.
 
-One-click fix prepends MT_ to any non-conforming material name.
+### 6. File Cleanup - Orphan Data
+Scans for unused data-blocks with zero users across: meshes, materials, images, textures, actions, armatures, collections, curves, cameras, lights, and node groups.
 
-6. File Cleanup – Orphan Data
+**Purge Orphans** removes them all recursively in one click.
 
-Scans for unused data-blocks with zero users across meshes, materials, images, textures, actions, armatures, collections, curves, cameras, lights, and node groups.
+### 7. Packed Files
+Checks whether external assets are embedded in the `.blend`:
 
-Purge Orphans removes them all recursively in one click.
+- Images (file-sourced)
+- Sounds
+- Fonts
+- Movie clips
+- Linked libraries (flagged as a warning - they cannot be packed normally)
 
-7. Packed Files
+**Pack All** embeds everything packable in one click.
 
-Checks whether external assets are embedded in the .blend:
+---
 
-Images (file-sourced)
-Sounds
-Fonts
-Movie clips
-Linked libraries (flagged as a warning since they cannot be packed normally)
-
-Pack All embeds everything packable in one click.
-
-Results Panel
+## Results Panel
 
 After running the audit, all failing items appear in a scrollable list.
 
-Click an item to select it in the 3D viewport
-Use the magnifier icon to select and frame it in the viewport
-The Issues box expands below the list to show every issue for the selected item with its own inline fix button
-When no object is selected in the viewport, the panel shows file-level issues such as orphans and unpacked assets
+- **Click an item** → selects it in the 3D viewport
+- **Magnifier icon** → selects and frames it in the viewport
+- **Issues box** → expands below the list to show every issue for the selected item with its own inline fix button
+- When no object is selected in the viewport, the panel automatically shows any file-level issues (orphans, unpacked assets)
 
-The Pass / Fail counter at the top updates live as you fix issues.
+**Pass / Fail counter** at the top updates live as you fix issues.
 
-Ignore Issues
+---
 
-Every issue has an ✕ button next to it. Clicking it suppresses that specific issue for that specific object so it no longer appears in results. Useful for intentional exceptions that do not need to be fixed.
+## Ignore Issues
 
-Scene Settings
+Every issue has an **✕ button** next to it. Clicking it suppresses that specific issue for that specific object so it no longer appears in results - useful for intentional exceptions that don't need to be fixed.
+
+---
+
+## Scene Settings
 
 Accessible directly from the QA panel without opening the Properties editor:
 
-Setting	Details
-Frame Rate	Shows the editable FPS value and the computed decimal rate (for example, 23.976 fps)
-Unit Length	Dropdown restricted to Inches, Centimeters, Meters, Feet. Automatically sets both the unit and the measurement system
-Installation
-Download QA_15.py
-In Blender, go to Edit → Preferences → Add-ons → Install
-Select the downloaded file and click Install Add-on
-Enable the add-on by ticking the checkbox next to Quality Audit Checker
-Open the 3D Viewport, press N to open the sidebar, and click the QA Audit tab
+| Setting | Details |
+|---|---|
+| Frame Rate | Shows the editable FPS value and the computed decimal rate (e.g. `= 23.976 fps`) |
+| Unit Length | Dropdown restricted to **Inches**, **Centimeters**, **Meters**, **Feet** - automatically sets both the unit and the measurement system (Imperial / Metric) |
 
-Minimum Blender version: 5.0.0
+---
 
-Usage Workflow
-Open your .blend file
-Go to the QA Audit tab in the N-panel
-Click Run Quality Audit
-Review the Pass / Fail summary
-Click any failing item in the results list to select it in the viewport
-Use the inline fix buttons to resolve each issue one by one, or use the global fix buttons for bulk operations
-Re-run the audit to confirm everything passes
-Use Purge Orphans and Pack All before final export
-Checks Toggle
+## Installation
 
-Each check can be individually enabled or disabled under the collapsible Checks section in the panel. Useful if your pipeline has different conventions or if you want to focus on specific issues only.
+1. Download `QA_15.py`
+2. In Blender, go to `Edit → Preferences → Add-ons → Install`
+3. Select the downloaded file and click **Install Add-on**
+4. Enable the add-on by ticking the checkbox next to **Quality Audit Checker**
+5. Open the 3D Viewport, press **N** to open the sidebar, and click the **QA Audit** tab
 
-Toggle	Default
-Applied transforms	On
-UV channel names	On
-Object and mesh names match	On
-File is purged	On
-All elements are packed	On
-Mesh prefixes SM_ / SK_	On
-Material prefix MT_	On
+**Minimum Blender version:** 5.0.0
 
-The UV name pattern is also editable (regex). Default: ^UV_.*
+---
 
-Naming Conventions Reference
-Asset type	Convention	Example
-Static mesh object	SM_ prefix	SM_Barrel, SM_Wall_A
-Skeletal mesh object	SK_ prefix	SK_Character, SK_Hand
-Material	MT_ prefix	MT_Barrel_Metal, MT_Skin
-UV channel	UV_ prefix	UV_Map, UV_Lightmap
-License
+## Usage Workflow
 
-MIT. Free to use, modify, and distribute.
+1. Open your `.blend` file
+2. Go to the **QA Audit** tab in the N-panel
+3. Click **Run Quality Audit**
+4. Review the Pass / Fail summary
+5. Click any failing item in the results list to select it in the viewport
+6. Use the inline fix buttons to resolve each issue one by one — or use the global fix buttons for bulk operations
+7. Re-run the audit to confirm everything passes
+8. Use **Purge Orphans** and **Pack All** before final export
 
-If you want, I can also make this more “product-page ready” (like Gumroad/Notion/README for GitHub) or tighten it into a pitch version for internal rollout.
+---
+
+## Checks Toggle
+
+Each check can be individually enabled or disabled under the collapsible **Checks** section in the panel. Useful if your pipeline has different conventions or you want to focus on specific issues only.
+
+| Toggle | Default |
+|---|---|
+| Applied transforms | On |
+| UV channel names | On |
+| Object and mesh names match | On |
+| File is purged | On |
+| All elements are packed | On |
+| Mesh prefixes SM_ / SK_ | On |
+| Material prefix MT_ | On |
+
+The UV name pattern is also editable (regex). Default: `^UV_.*`
+
+---
+
+## Naming Conventions Reference
+
+| Asset type | Convention | Example |
+|---|---|---|
+| Static mesh object | `SM_` prefix | `SM_Barrel`, `SM_Wall_A` |
+| Skeletal mesh object | `SK_` prefix | `SK_Character`, `SK_Hand` |
+| Material | `MT_` prefix | `MT_Barrel_Metal`, `MT_Skin` |
+| UV channel | `UV_` prefix | `UV_Map`, `UV_Lightmap` |
